@@ -1,0 +1,30 @@
+.formContainer{
+    margin-top: 64px;    
+}
+.containerControl{
+    display: flex;
+}
+
+.radioGroup{
+    display: flex;
+}
+.paperDetails{
+    display: flex;
+}
+
+.inputSections{
+    margin : '1rem';
+    margin-right: 20px;
+}
+.btn{
+    margin:20px;
+    margin-bottom:20;
+    display:"block"
+}
+
+
+@media only screen and (max-width:600px) {
+    .containerControl{
+        display: block;
+    }
+}
