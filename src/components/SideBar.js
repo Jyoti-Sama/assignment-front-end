@@ -8,12 +8,15 @@ import { Button } from '@mui/material';
 
 import style from '../style.module.css'
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setSubjectData } from '../reducers/subjectStore';
+import { setIsMainPartReload } from '../reducers/editSubjectStore';
 
 export default function SideBar() {
-    const dispatch = useDispatch();  
-    
+    const { isMainPartReloaded } = useSelector((state) => state.editSubjectData);
+    const dispatch = useDispatch();
+
+
     const [sem, setSem] = useState('sem_06')
     const [avilableSub, setAvilableSub] = useState(["math", "chemistry", "basic"])
     const [selectedSub, setSelectedSub] = useState('')
@@ -41,7 +44,7 @@ export default function SideBar() {
                     dispatch(setSubjectData(data))
                 })
                 .catch((err) => {
-                      setLoadingBtn('contained')
+                    setLoadingBtn('contained')
                     console.log(err)
                 })
         }
@@ -77,49 +80,53 @@ export default function SideBar() {
         }
     }
 
-
-    // console.log(avilableSub)
+    if (isMainPartReloaded) {
+        searchAssignment();
+        dispatch(setIsMainPartReload(false));
+    }
 
     return (
-        <div className={style.side_bar}>
-            <FormControl>
-                <FormLabel>Semister</FormLabel>
-                <RadioGroup
-                    defaultValue={"sem_06"}
-                    name="radio-buttons-group"
-                    onChange={(e) => {
-                        setSem(e.target.value);
-                        validSubChoise();
-                    }}
-                >
-                    <FormControlLabel value="sem_01" control={<Radio />} label="1st sem" />
-                    <FormControlLabel value="sem_02" control={<Radio />} label="2nd sem" />
-                    <FormControlLabel value="sem_03" control={<Radio />} label="3rd sem" />
-                    <FormControlLabel value="sem_04" control={<Radio />} label="4th sem" />
-                    <FormControlLabel value="sem_05" control={<Radio />} label="5th sem" />
-                    <FormControlLabel value="sem_06" control={<Radio />} label="6th sem" />
-                    <FormControlLabel value="sem_07" control={<Radio />} label="7th sem" />
-                    <FormControlLabel value="sem_08" control={<Radio />} label="8th sem" />
-                </RadioGroup>
-            </FormControl>
+        <div>
+            <div className={style.side_bar}>
+                <FormControl>
+                    <FormLabel>Semister</FormLabel>
+                    <RadioGroup
+                        defaultValue={"sem_06"}
+                        name="radio-buttons-group"
+                        onChange={(e) => {
+                            setSem(e.target.value);
+                            validSubChoise();
+                        }}
+                    >
+                        <FormControlLabel value="sem_01" control={<Radio />} label="1st sem" />
+                        <FormControlLabel value="sem_02" control={<Radio />} label="2nd sem" />
+                        <FormControlLabel value="sem_03" control={<Radio />} label="3rd sem" />
+                        <FormControlLabel value="sem_04" control={<Radio />} label="4th sem" />
+                        <FormControlLabel value="sem_05" control={<Radio />} label="5th sem" />
+                        <FormControlLabel value="sem_06" control={<Radio />} label="6th sem" />
+                        <FormControlLabel value="sem_07" control={<Radio />} label="7th sem" />
+                        <FormControlLabel value="sem_08" control={<Radio />} label="8th sem" />
+                    </RadioGroup>
+                </FormControl>
 
 
 
-            <FormControl>
-                <FormLabel>subjects</FormLabel>
-                <RadioGroup
-                    defaultValue={""}
-                    name="radio-buttons-group2"
-                    onChange={(e) => setSelectedSub(e.target.value)}
-                >
-                    {avilableSub.map((item, index) => {
-                        return (
-                            <FormControlLabel key={index} value={item} control={<Radio />} label={item} />)
-                    })}
+                <FormControl>
+                    <FormLabel>subjects</FormLabel>
+                    <RadioGroup
+                        defaultValue={""}
+                        name="radio-buttons-group2"
+                        onChange={(e) => setSelectedSub(e.target.value)}
+                    >
+                        {avilableSub.map((item, index) => {
+                            return (
+                                <FormControlLabel key={index} value={item} control={<Radio />} label={item} />)
+                        })}
 
-                </RadioGroup>
-            </FormControl>
-
+                    </RadioGroup>
+                </FormControl>
+            </div>
+            <div className={style.search_btm}>
             <Button
                 className={style.search_btm}
                 onClick={(e) => searchAssignment(e)}
@@ -128,6 +135,7 @@ export default function SideBar() {
             >
                 search
             </Button>
+            </div>
         </div>
     );
 }

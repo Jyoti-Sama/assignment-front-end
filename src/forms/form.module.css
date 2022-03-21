@@ -1,5 +1,11 @@
 .formContainer{
-    margin-top: 64px;    
+    margin-top: 64px; 
+    padding: 30px;
+}
+.formContainerEdit{
+    margin: -16px 0 0 0; 
+    padding: 20px;
+    background-color:whitesmoke;
 }
 .containerControl{
     display: flex;
@@ -10,11 +16,39 @@
 }
 .paperDetails{
     display: flex;
+    margin: 20px;
+}
+.paperDetailsOne{
+    margin: 10px;
+}
+.paperDetailsTwo{
+    margin: 10px;
+}
+.inputSections2{
+    margin: 20px 30px 20px 30px;
+}
+.paperDetailsEdit{
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
 }
 
 .inputSections{
     margin : '1rem';
     margin-right: 20px;
+}
+.inputSectionsEdit{
+    margin : 20px;
+    margin-right: 20px;
+}
+.detailsSectionEdit{
+    margin: 0 10px 0 10px;
+}
+.keySection{
+    margin: 0 30px 20px 30px;
+}
+.fileSection{
+    margin-left: 30px;
 }
 .btn{
     margin:20px;

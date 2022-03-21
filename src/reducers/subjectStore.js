@@ -7,11 +7,12 @@ export const SubjectDataSlice = createSlice({
     initialState: {
         value: [{
             _id:"1",
-            subject:"subject name",
+            sem:"sem_06",
+            subject:"control",
             year:2022,
-            image:null,
-            exam:"exam type",
-            AboutPaper:"its a example"
+            image:"",
+            exam:"It's a default card",
+            AboutPaper:"please select subject and sem then press search to load assignments"
           }],
         
     },

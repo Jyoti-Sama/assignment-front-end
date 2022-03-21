@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import FileBase from 'react-file-base64';
 
 //mui
 import Radio from '@mui/material/Radio';
@@ -11,33 +10,38 @@ import FormLabel from '@mui/material/FormLabel';
 import { Button, TextField } from '@mui/material'
 
 //custom styling
-import style from './form.module.css'
+import style from '../form.module.css'
+
+// editSubjectData
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { setIsEditClicked, setIsMainPartReload, setIsModalOpen } from '../../reducers/editSubjectStore';
 
 
-
-function SubjectAdd() {
-
+function EditSubject() {
   let navigate = useNavigate();
+  const { value } = useSelector((state)=> state.editSubjectData);
+  const { isEditClicked } = useSelector((state)=> state.editSubjectData);
+  const dispatch = useDispatch();  
+
+
+  console.log(value)
 
   // for exam details statr
-
-  const [paperType, setpaperType] = useState('')
+  
+  const [paperType, setpaperType] = useState(value.exam)
   const [paperTypeError, setpaperTypeError] = useState(false)
 
-  const [paperYear, setpaperYear] = useState('')
+  const [paperYear, setpaperYear] = useState(value.year)
   const [paperYearError, setpaperYearError] = useState(false)
 
-  const [paperDetails, setpaperDetails] = useState('')
+  const [paperDetails, setpaperDetails] = useState(value.AboutPaper)
 
   // for radio group state
 
-  const [sem, setSem] = useState('sem_06')
+  const [sem, setSem] = useState(value.sem)
   const [avilableSub, setAvilableSub] = useState(["math", "chemistry", "basic"])
-  const [selectedSub, setSelectedSub] = useState('')
-
-  // for image uploading
-
-  const [imageData, setImageData] = useState('')
+  const [selectedSub, setSelectedSub] = useState(value.subject)
 
   //key for operation
 
@@ -82,12 +86,13 @@ function SubjectAdd() {
   // for form submit action
 
   const handelSubmit = (e) => {
-
+    
     e.preventDefault();
 
     setpaperTypeError(false)
     setpaperYearError(false)
     setOpkeyError(false)
+
 
     if (paperType === '') {
       setpaperTypeError(true)
@@ -95,11 +100,7 @@ function SubjectAdd() {
 
     if (paperYear === '') {
       setpaperYearError(true)
-    }
-
-    if (opKEY === '') {
-      setOpkeyError(true)
-    }
+    }    
 
     if (sem === '') {
       alert("please choose the sem")
@@ -109,34 +110,41 @@ function SubjectAdd() {
       alert("please choose a subject")
     }
 
-    if (imageData.image.base64 === "") {
-      alert("please select a image")
+    if (opKEY === '') {
+      setOpkeyError(true)
     }
 
-
-
-    if (sem && selectedSub && paperType && paperYear && imageData && opKEY) {
+    if (sem && selectedSub && paperType && paperYear && opKEY ) {
       setLoadingBtn('disabled')
-      console.log(sem, selectedSub, paperType, paperYear, paperDetails, imageData)
+      console.log(sem, selectedSub, paperType, paperYear, paperDetails)
 
-      fetch('http://localhost:8000/post', {
-        method: 'POST',
+      fetch('http://localhost:8000/post/edit', {
+        method: 'PUT',
         headers: { "Content-type": "application/json" },
-        body: JSON.stringify({ sem, subject: selectedSub, exam: paperType, year: paperYear, AboutPaper: paperDetails, paperImage: imageData.image.base64, operationKey: opKEY })
-      }).then(() => {
-        console.log(paperType, paperYear)
-        navigate("/");
-        setLoadingBtn('contained')
-      }).catch(() => setLoadingBtn('contained'))
+        body: JSON.stringify({ _id:value._id, sem, subject: selectedSub, exam: paperType, year: paperYear, AboutPaper: paperDetails, operationKey: opKEY })
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+          setLoadingBtn('contained');
+          navigate('/');   
+          dispatch(setIsEditClicked(!isEditClicked));   
+          dispatch(setIsMainPartReload(true));
+          dispatch(setIsModalOpen(false))
+      })
+      .catch((err) => {
+            setLoadingBtn('contained')
+            console.log(err)
+            dispatch(setIsEditClicked(!isEditClicked));      
+            dispatch(setIsModalOpen(false));
+      })
 
     }
 
   }
-
-
   return (
 
-    <div className={style.formContainer}>
+    <div className={style.formContainerEdit}>
       <form noValidate autoComplete='off' onSubmit={handelSubmit}>
 
         <div className={style.containerControl}>
@@ -146,7 +154,7 @@ function SubjectAdd() {
             <FormControl>
               <FormLabel>Semister</FormLabel>
               <RadioGroup
-                defaultValue={"sem_06"}
+                defaultValue={value.sem}
                 name="radio-buttons-group"
                 onChange={(e) => {
                   setSem(e.target.value);
@@ -167,7 +175,7 @@ function SubjectAdd() {
             <FormControl>
               <FormLabel>subjects</FormLabel>
               <RadioGroup
-                defaultValue={""}
+                defaultValue={value.subject}
                 name="radio-buttons-group2"
                 onChange={(e) => setSelectedSub(e.target.value)}
               >
@@ -183,52 +191,55 @@ function SubjectAdd() {
           <div>
             {/* second the subject type & paper Year */}
 
-            <div className={style.paperDetails}>
-              <div className={style.paperDetailsOne}>
-                <TextField
-                  onChange={(e) => setpaperType(e.target.value)}
-                  className={style.inputSections}
-                  label="Paper Type"
-                  variant="outlined"
-                  color='secondary'
-                  fullWidth
-                  required
-                  error={paperTypeError}
-                />
-              </div>
-
-              <div className={style.paperDetailsTwo}>
-                <TextField
-                  onChange={(e) => setpaperYear(e.target.value)}
-                  className={style.inputSections}
-                  label="Paper Year"
-                  variant="outlined"
-                  color='secondary'
-                  type={"number"}
-                  fullWidth
-                  required
-                  error={paperYearError}
-                />
-              </div>
-            </div>
-
-            {/* third the paper details  */}
-
-            <div className={style.inputSections2}>
+            <div className={style.paperDetailsEdit}>
               <TextField
-                onChange={(e) => setpaperDetails(e.target.value)}
-                className={style.inputSections}
-                label="Paper Details"
+                defaultValue={value.exam}
+                onChange={(e) => setpaperType(e.target.value)}
+                className={style.inputSectionsEdit}
+                style={{margin:"10px 0"}}
+                label="Paper Type"
                 variant="outlined"
                 color='secondary'
                 fullWidth
+                required
+                error={paperTypeError}
+              />
+              <TextField
+              defaultValue={value.year}
+              onChange={(e) => setpaperYear(e.target.value)}
+              className={style.inputSectionsEdit}
+              style={{margin:"10px 0"}}
+              label="Paper Year"
+              variant="outlined"
+              color='secondary'
+              type={"number"}
+              fullWidth
+              required
+              error={paperYearError}
               />
             </div>
-            <div className={style.keySection}>
+              
+            {/* third the paper details  */}
+            
+            <div className={style.detailsSectionEdit}>
+            <TextField
+            defaultValue={value.AboutPaper}
+              onChange={(e) => setpaperDetails(e.target.value)}
+              className={style.inputSectionsEdit}
+              style={{margin:"10px 0"}}
+              label="Paper Details"
+              variant="outlined"
+              color='secondary'
+              fullWidth
+            />
+            </div>
+
+            <div className={style.detailsSectionEdit}>
               <TextField
-                defaultValue={''}
+              defaultValue={''}
                 onChange={(e) => setOpKEY(e.target.value)}
                 className={style.inputSectionsEdit}
+                style={{margin:"10px 0"}}
                 label="key"
                 variant="outlined"
                 color='secondary'
@@ -237,15 +248,6 @@ function SubjectAdd() {
                 error={opkeyError}
               />
             </div>
-
-            <div className={style.fileSection}>
-              <FileBase
-                type="file"
-                multiple={false}
-                onDone={(base64) => setImageData({ image: base64 })}
-              />
-            </div>
-
           </div>
         </div>
 
@@ -257,11 +259,11 @@ function SubjectAdd() {
           variant={loadingBtn}
           color="secondary"
         >
-          Add
+          Update
         </Button>
       </form>
     </div>
   )
 }
 
-export default SubjectAdd;
+export default EditSubject;
